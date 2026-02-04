@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 
 try:
-    from moviepy.editor import VideoFileClip
+    from moviepy import VideoFileClip
     import speech_recognition as sr
 except ImportError as e:
     print(f"Error: Missing required library - {e}")

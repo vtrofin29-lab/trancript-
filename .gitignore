@@ -14,13 +14,8 @@ dist/
 build/
 *.egg-info/
 
-# Temporary files
-temp_audio.wav
-*.wav
-*.mp3
-
-# Transcription output files
-*_transcription.txt
+# Temporary audio files
+transcript_audio_*.wav
 
 # IDE
 .vscode/

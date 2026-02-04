@@ -7,6 +7,7 @@ This script extracts audio from a video file and transcribes it to text.
 import argparse
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -89,8 +90,9 @@ def transcribe_video(video_path, output_path=None):
         video_name = Path(video_path).stem
         output_path = f"{video_name}_transcription.txt"
     
-    # Create temporary audio file
-    temp_audio = "temp_audio.wav"
+    # Create temporary audio file with unique name
+    temp_audio_fd, temp_audio = tempfile.mkstemp(suffix=".wav", prefix="transcript_audio_")
+    os.close(temp_audio_fd)  # Close the file descriptor as we'll write with moviepy
     
     try:
         # Extract audio from video
@@ -98,6 +100,16 @@ def transcribe_video(video_path, output_path=None):
         
         # Transcribe audio to text
         transcription = transcribe_audio(temp_audio)
+        
+        # Check if transcription is empty
+        if not transcription or transcription.strip() == "":
+            print("\nWarning: No speech was detected or transcription resulted in empty text.")
+            print("This could be due to:")
+            print("  - No speech in the video")
+            print("  - Poor audio quality")
+            print("  - Unsupported language")
+            print("  - Background noise")
+            transcription = "[No speech detected or transcription failed]"
         
         # Save transcription to file
         with open(output_path, 'w', encoding='utf-8') as f:
@@ -110,7 +122,7 @@ def transcribe_video(video_path, output_path=None):
         # Clean up temporary audio file
         if os.path.exists(temp_audio):
             os.remove(temp_audio)
-            print(f"Cleaned up temporary file: {temp_audio}")
+            print(f"\nCleaned up temporary file: {temp_audio}")
 
 
 def main():
